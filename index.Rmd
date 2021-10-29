@@ -26,7 +26,6 @@ tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
 Paragraph or two introducing your datasets and variables, why they are interesting to you, etc.
 
 ```{R}
-# read your datasets in here, e.g., with read_csv()
 library(readr)
 state_candy <- read_csv("/stor/home/sji259/project1/state_candy.csv")
 state_candy
@@ -57,11 +56,13 @@ joined_candy <- right_join(candy_rankings, state_candy, by=c("competitorname"="T
 glimpse(joined_candy)
 glimpse(candy_rankings)
 glimpse(state_candy)
+joined_candy %>% summarize(sum(is.na(chocolate)))
+anti_join(state_candy, candy_rankings, by=c("Top Candy"="competitorname"))
+anti_join(candy_rankings,state_candy, by=c("competitorname"="Top Candy"))
 ```
 
 I decided to complete a right join with my two datasets so that I could more easily focus on the Halloween candy statistics specifically for all 50 states, and Washington D.C without seeing all of the NA values for the Halloween candies that were not a top choice of any state. In the two separate datasets, the candy_rankings dataset had 85 observations and 14 distinct variables while the state_candy dataset had 51 observations and 3 distinct variables. However, in this right join, there were 51 observations and they were joined using 1 distinct ID variable. However, this ID variable had different names in each dataset, which had to be accounted for. Because of this, all of the original variables from the two separate datasets were present in the joined dataset, however the "Top Candy" ID variable from the state_candy dataset combined with the "competitiorname" ID variable from the candy_rankings dataset. This resulted in 16 distinct variables in the joined dataset.The state_candy dataset kept all of its observations in the joined dataset, however the candy_rankings lost 34 observations which were of candies that were no state's favorite. 
-
-ALSO THERE WERE -------- CANDIES THAT WERE IN THE STATE_CANDY BUT NOT IN THE CANDY_RANKINGS RESULTING IN ----- NAs.
+Also, there were 12 candies that were in the state_candy dataset but not in the candy_rankings which led to 12 rows that contain NAs for some of the variables in the joined dataset. Lastly, there were 72 candies in the candy_rankings dataset but not in the state_candy dataset.
 
 ####  Wrangling
 
@@ -75,14 +76,14 @@ When using mutate, I created a variable called Kilograms which converts the poun
 joined_candy %>% group_by(competitorname) %>% summarize(count=n_distinct(State)) %>% arrange(desc(count))
 
 ```
-In order to visualize which Halloween candies were popular in the most states, I first used group_by to group all of the candies together, then I used summarize to count up the distinct states that each candy was the favorite of. Lastly, I arranged this count in descending order so that the most popular candies could be viewed. From this I gathered that Reese's cups, Sour Patch Kids, and Starburst are tied for most popular as they all are the favorite in 6 different states. Meanwhile, 3 Musketeers, Almond Joy, Blow Pops, Dubble Bubble Gum, Lemonheads, Milky Way, Swedish Fish, and Twix are all tied for least popular as they each only are the favorite of one state. 
+In order to visualize which Halloween candies were popular in the most states, I first used group_by to group all of the candies together, then I used summarize to count up the distinct states that each candy was the favorite of. Lastly, I arranged this count in descending order so that the most popular candies could be viewed. From this I gathered that Reese's cups, Sour Patch Kids, and Starburst are tied for most popular as they all are the favorite in 6 different states. 
 
 ```{R}
 joined_candy %>% filter(Pounds == max(Pounds)) %>% select("competitorname","winpercent","State","Pounds")
 joined_candy %>% arrange(desc(winpercent))
 ```
 
-I was curious to know which candy had been purchased the most by weight. To figure this out, I filtered the joined_candy data so that the row with the highest Pound variable was chosen, then I selected the columns that I was interested in seeing, in this case, the columns for the candy name, the win percentage that the candy has when it went up against other candies, the state that bought the pounds of candy, and the number of pounds that were bought. I learned that California bought the most candy, which happened to be Reese's Peanut Butter Cups. It also worked out that this candy had the highest win percentage, which I found by arranging the data in a descending order according to win percentage. 
+I was curious to know which candy had been purchased the most by weight. To figure this out, I filtered the joined_candy data so that the row with the highest Pound variable was chosen, then I selected the columns that I was interested in seeing, in this case, the columns for the candy name, the win percentage that the candy has won when it went up against other candies, the state that bought the pounds of candy, and the number of pounds that were bought. I learned that California bought the most candy, which happened to be Reese's Peanut Butter Cups. It also worked out that this candy had the highest win percentage, which I found by arranging the data in a descending order according to win percentage. 
 
 ```{R}
 library(knitr)
@@ -99,7 +100,7 @@ joined_candy %>% summarize(mean_price=mean(pricepercent, na.rm=T), price_sd=sd(p
 table2 %>% kable(digits = 3, align = 'c', col.names=str_to_title(names(.)))
 
 ```
-The numeric variable price percent is a record of the price percentile per unit that the candy falls into in comparison with the other candies in the dataset. In order to compare this percentile calculation to the other percentile variable sugarpercent, I calculated the same summary statistics for both variables. For the average price percentile of these candies, it was found to be in about the 39th percentile. The standard deviation in price percentile was found to be 0.2537781 with a variance of 0.06440331. This shows that when compared to sugarpercent, pricepercent has on average a lower percentile, a lower standard deviation, and a lower variance. Likewise with sugarpercent, there are still 51 observations. 
+The numeric variable price percent is a record of the price percentile per unit that the candy falls into in comparison with the other candies in the dataset. In order to compare this percentile calculation to the other percentile variable sugarpercent, I calculated the same summary statistics for both variables. When compared to sugarpercent, pricepercent has on average a lower percentile, a lower standard deviation, and a lower variance. Likewise with sugarpercent, there are still 51 observations. 
 
 ```{R}
 library(knitr)
@@ -109,7 +110,7 @@ table3 %>% kable(digits = 3, align = 'c', col.names=str_to_title(names(.)))
 joined_candy %>% group_by(chocolate) %>% summarize(winmean=mean(winpercent, na.rm=T), win_min=min(winpercent, na.rm=T), win_max=(max(winpercent, na.rm=T))) -> table4
 table4 %>% kable(digits = 3, align = 'c', col.names=str_to_title(names(.)))
 ```
-The next numeric variable I had was winpercent, which is the percentage that the candy in question won against 269,000 matchups with other candies. First, I wanted to see just the overall average of wins throughout all the candy in the data set. This came to be 64.548%, which means the candies in this dataset won 64.548% of the time,on average. Next, I wanted to see how just the chocolate group performed, and if they won more or less often than the entire group. After grouping by chocolate, the winning average fo candies that contained chocolate was 66.94112% while candies without chocolate won an average of 61.45102% of the time. I also found the minimum and maximum of the candies that had chocolate and those that don't. Candies that do have chocolate have a much higher maximum and minimum winning percent than candies without chocolate, which shows that chocolate-containing candies might be more popular. 
+The next numeric variable I had was winpercent, which is the percentage that the candy in question won against 269,000 matchups with other candies. First, I wanted to see just the overall average of wins throughout all the candy in the data set, which was 64.548%. Next, I wanted to see how just the chocolate group performed, and if they won more or less often than the entire group. After grouping by chocolate, the winning average for candies that contained chocolate was 66.94112% while candies without chocolate won an average of 61.45102% of the time. I also found the minimum and maximum of the candies that had chocolate and those that don't, which shows that chocolate-containing candies might be more popular. 
 
 ```{R}
 library(knitr)
@@ -120,7 +121,7 @@ joined_candy %>% group_by(fruity, chocolate) %>% summarize(mean_weight=mean(Poun
 table6 %>% kable(digits = 3, align = 'c', col.names=str_to_title(names(.)))
 ```
 The last numeric variable is Pounds, which is the weight in pounds that each state bought of their favorite candy. First, I wanted to just see some characteristics about this variable. I found that the mean pounds of candy bought overall was 159,803.5 lbs with a max of 1,209,299 lbs and a min of 2873 lbs. 
-Next, I wanted to see if the type of candy had any effect on the number of pounds bought, so I grouped by fruity type and chocolate type to see any differences. I found that candies that were only chocolate flavored had been bought for 175,840.3 lbs on average, candies that were only fruity had been bought for 128,243.8 lbs on average, and candies that were both fruity and chocolate type had been bought for 207,222.0 lbs on average. This shows that when fruity and chocolate type flavors are in the same candy, more pounds of the candy are sold followed by only chocolate, followed by only fruity. 
+Next, I wanted to see if the type of candy had any effect on the number of pounds bought, so I grouped by fruity type and chocolate type to see any differences. After grouping them the data showed that when fruity and chocolate type flavors are in the same candy, more pounds of the candy are sold followed by only chocolate, followed by only fruity. 
 
 ```{R}
 library(knitr)
@@ -135,27 +136,45 @@ There are only two character type variables in the joined dataset, competitornam
 #### Visualizing
 
 ```{R}
-# your plot 1
+library(ggplot2)
+joined_candy %>% group_by(chocolate) %>% na.omit() %>% 
+  ggplot(aes(x=chocolate, fill=chocolate)) +
+  geom_bar(aes(y=sugarpercent), stat="summary", fun=mean)+
+  geom_errorbar(aes(y=sugarpercent), stat="summary", fun.data=mean_se, width=0.6) +
+  xlab("Chocolate")+
+  ylab("Sugar Percentile")+
+  ggtitle("Chocolate and Sugar")+
+  theme(legend.position = "none")+
+  scale_y_continuous(breaks=seq(0,0.8,.1))
 ```
-
-Your discussion of plot 1
+This bar plot analyzes the relationship between chocolate content of a candy and how this corresponds to its sugar content. Based on this plot, it is shown that candies with chocolate seem to be in a much higher sugar percentile than all other candies without chocolate. This relationship is still seen even with the error bars on the graph, which means that on average, candies with chocolate have more sugar than those without chocolate. 
 
 ```{R}
-# your plot 2
+joined_candy %>% 
+  ggplot(aes(x=sugarpercent,y=pricepercent)) +
+    geom_smooth(method="lm", color="Orange")+
+  geom_point(position=position_jitter(width=.1,height=.1), color="Purple")+
+  scale_y_continuous(breaks=seq(0,1,.1)) +
+  scale_x_continuous(breaks=seq(0,1,.1)) +
+  ggtitle("Price and Sugar") +
+  xlab("Sugar Percentile") +
+  ylab("Price Percentile")
 ```
 
-Your discussion of plot 2
+This scatterplot itself has points which display the relationship between the sugar percentile a certain Halloween candy is in to the candy's price percentile. This plot also has a regression line so that the relationship between these two variables can be seen more clearly. As seen in this plot, it appears that there is a positive correlation between sugar percentile and price percentile. This means that as a candy has more sugar relative to the other candies, then its price goes up relative to the other candies, on average. 
 
 ```{R}
-# your plot 3
+joined_candy %>% 
+  ggplot(aes(x=State, fill=competitorname))+
+  geom_bar(aes(y=Pounds), stat="summary", fun=mean) +
+  theme(legend.position = "none", axis.text.x = element_text(angle=90, hjust=1))+
+  scale_y_continuous(breaks=seq(0,10000000,100000))+
+  ggtitle("Pounds of Halloween Candy")+
+  xlab("State")
 ```
 
-Your discussion of plot 3
+This plot clearly displays the relationship between state and the number of pounds of the state's favorite Halloween candy that have been bought. Through this plot it is apparent that California and Texas purchased the most, while Alaska and Connecticut purchased the least. This is probably due to population differences, how much the different states celebrate Halloween, and possibly candy availability. 
 
 #### Concluding Remarks
 
-If any!
-
-
-
-
+Overall, this project allowed me to analyze the different consumer behaviors for Halloween candies throughout the United States, and how different types of candies can alter their popularity, amount of sugar, and their price. These relationships were able to be closely examined by using various wrangling, tidying, joining, and visualization strategies as shown throughout the project. 
