@@ -67,7 +67,8 @@ data2 <- read_csv("https://some.website/dataset2.csv")
 3. Create summary statistics
 
     - Use *all six* core `dplyr` functions (`filter, select, arrange, group_by, mutate, summarize`) to manipulate and explore your dataset. For mutate, create a  new variable that is a function of at least one other variable, preferably using a dplyr vector function (see dplyr cheatsheet). It's totally fine to use the `_if`, `_at`, `_all` versions of mutate/summarize instead (indeed, it is encouraged if you have lots of variables). Use a `stringr` function such as str_detect or str_replace_all with regex at least once.
-    
+ 
+
     - Using `dplyr`, create summary statistics (`mean, sd, var, n, quantile, min, max, n_distinct, cor`, etc) for each of your numeric variables. If you have lots of numeric variables (e.g., 10+), pick a few that are of interest and just summarize based on those. For your categorical variables, report the frequencies/counts of each level. Finally, report the number of missing values (NAs) for each variable.
     
     - Compute these statistics both overall and after grouping by one or more categorical variables (either together or one-at-a-time; if you have two categorical variables, include at least one statistic based on a grouping of two categorical variables simultaneously). If you do not have any categorical variables, create one using mutate (e.g., with `case_when` or `ifelse`) to satisfy the `group_by` requirements above. Compute at least one summary stat with a user-defined function rather than a built-in one. 
