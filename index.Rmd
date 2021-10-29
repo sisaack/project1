@@ -26,6 +26,7 @@ tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
 Paragraph or two introducing your datasets and variables, why they are interesting to you, etc.
 
 ```{R}
+# read your datasets in here, e.g., with read_csv()
 library(readr)
 state_candy <- read_csv("/stor/home/sji259/project1/state_candy.csv")
 state_candy
@@ -177,4 +178,7 @@ This plot clearly displays the relationship between state and the number of poun
 
 #### Concluding Remarks
 
-Overall, this project allowed me to analyze the different consumer behaviors for Halloween candies throughout the United States, and how different types of candies can alter their popularity, amount of sugar, and their price. These relationships were able to be closely examined by using various wrangling, tidying, joining, and visualization strategies as shown throughout the project. 
+Overall, this project allowed me to analyze the different consumer behaviors for Halloween candies throughout the United States, and how different types of candies can alter their popularity, amount of sugar, and their price. These relationships were able to be closely examined by using various wrangling, tidying, joining, and visualization strategies as shown throughout this project.
+
+
+
