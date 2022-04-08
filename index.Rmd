@@ -23,7 +23,7 @@ tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
 
 #### Introduction 
 
-Paragraph or two introducing your datasets and variables, why they are interesting to you, etc.
+This project uses two datasets to analyze distinct consumer choices of Halloween candy consumption. The first dataset came from an article regarding each of the 50 U.S. states’ favorite Halloween candy and focuses on which candy is each state’s favorite as well as the number of pounds purchased by each state. The second original dataset came from the fivethirtyeight library already available on R and focuses on the flavors present in each listed candy as well as their sugar percentiles, price percentiles, and how often the candy won a popularity poll when pitted against the other candies.
 
 ```{R}
 # read your datasets in here, e.g., with read_csv()
@@ -35,8 +35,6 @@ candy_rankings <- candy_rankings
 ```
 
 #### Tidying: Reshaping
-
-If your datasets are tidy already, demonstrate that you can reshape data with pivot wider/longer here (e.g., untidy and then retidy). Alternatively, it may be easier to wait until the wrangling section so you can reshape your summary statistics. Note here if you are going to do this.
 
 ```{R}
 library(dplyr)
